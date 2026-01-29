@@ -1,5 +1,7 @@
 import Header from '@/components/Header';
 import { prisma } from '@/lib/db';
+import Link from 'next/link';
+import DefectStatusActions from '@/components/DefectStatusActions';
 
 export default async function DefectsPage() {
   const defects = await prisma.defect.findMany({
@@ -9,10 +11,21 @@ export default async function DefectsPage() {
 
   return (
     <div>
-      <Header title="Defects" description="Track and manage renovation defects" />
+      <Header
+        title="Defects"
+        description="Track and manage renovation defects"
+        action={
+          <Link
+            href="/dashboard/defects/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            + Report defect
+          </Link>
+        }
+      />
 
       <div className="p-6">
-        {/* Filter Tabs */}
+        {/* Filter Tabs (visual only for MVP) */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6">
@@ -77,7 +90,12 @@ export default async function DefectsPage() {
                           {defect.fixedDate && (
                             <span>✅ Fixed: {new Date(defect.fixedDate).toLocaleDateString()}</span>
                           )}
+                          {defect.approvedDate && (
+                            <span>👍 Approved: {new Date(defect.approvedDate).toLocaleDateString()}</span>
+                          )}
                         </div>
+
+                        <DefectStatusActions defectId={defect.id} status={defect.status} mode="admin" />
                       </div>
                     </div>
                   </div>

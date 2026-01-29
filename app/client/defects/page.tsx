@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/session';
+import DefectStatusActions from '@/components/DefectStatusActions';
 
 export default async function ClientDefectsPage() {
   const user = await getCurrentUser();
@@ -21,7 +22,7 @@ export default async function ClientDefectsPage() {
 
   return (
     <div>
-      <Header title="Defects & Issues" description="Track reported issues and their status" />
+      <Header title="Defects & Issues" description="Track reported issues and approve fixes" />
 
       <div className="p-6">
         <div className="bg-white rounded-lg shadow">
@@ -69,7 +70,12 @@ export default async function ClientDefectsPage() {
                       {defect.fixedDate && (
                         <span>✅ Fixed: {new Date(defect.fixedDate).toLocaleDateString()}</span>
                       )}
+                      {defect.approvedDate && (
+                        <span>👍 Approved: {new Date(defect.approvedDate).toLocaleDateString()}</span>
+                      )}
                     </div>
+
+                    <DefectStatusActions defectId={defect.id} status={defect.status} mode="client" />
                   </div>
                 ))}
               </div>
