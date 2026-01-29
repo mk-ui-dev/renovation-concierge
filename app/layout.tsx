@@ -1,10 +1,9 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { SessionProvider } from "next-auth/react";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Renovation Concierge",
-  description: "Concierge-style renovation management for busy homeowners.",
+  title: 'Renovation Concierge',
+  description: 'Professional renovation project management platform',
 };
 
 export default function RootLayout({
@@ -14,9 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-50 text-slate-900">
-        <SessionProvider>{children}</SessionProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
