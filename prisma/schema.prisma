@@ -1,0 +1,125 @@
+// Prisma schema for Renovation Concierge MVP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // "admin" or "client"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  projects  Project[]
+  siteVisits SiteVisit[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  address     String
+  description String?
+  status      String   // "planned" | "in_progress" | "completed"
+  package     String   // "basic" | "standard" | "premium"
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  clientId    String
+  client      User       @relation(fields: [clientId], references: [id])
+  milestones  Milestone[]
+  siteVisits  SiteVisit[]
+  defects     Defect[]
+  deliveries  Delivery[]
+  reports     Report[]
+}
+
+model Milestone {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  status      String   // "pending" | "in_progress" | "completed"
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model SiteVisit {
+  id          String   @id @default(uuid())
+  visitDate   DateTime
+  notes       String?
+  photos      String?  // JSON array of photo paths
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inspectorId String
+  inspector   User     @relation(fields: [inspectorId], references: [id])
+}
+
+model Defect {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  location    String   // Room or area
+  severity    String   // "low" | "medium" | "high"
+  status      String   // "open" | "fixed" | "approved"
+  photos      String?  // JSON array of photo paths
+  reportedDate DateTime @default(now())
+  fixedDate   DateTime?
+  approvedDate DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Delivery {
+  id              String   @id @default(uuid())
+  itemName        String
+  supplier        String?
+  expectedDate    DateTime
+  deliveredDate   DateTime?
+  status          String   // "pending" | "delivered" | "delayed"
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   // JSON or markdown
+  reportType  String   // "progress" | "final" | "inspection"
+  generatedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
